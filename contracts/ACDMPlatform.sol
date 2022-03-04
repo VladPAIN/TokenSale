@@ -121,6 +121,11 @@ contract ACDMPlatform is AccessControl, ReentrancyGuard {
         offer.status = Status.TradeRound;
         offer.timeStart = block.timestamp;
         token.burn(address(this), offer.totalSupply - offer.totalBuy);
+        
+        if(offer.totalBuy == offer.totalSupply) {
+            offer.status = Status.End;
+        }
+        
         offer.totalBuy = 0;
         emit StartTradeRound(offer.timeStart, offer.status);
 
