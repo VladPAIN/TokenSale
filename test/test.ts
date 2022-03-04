@@ -14,7 +14,6 @@ describe('Contract: ACDMPlatform', () => {
 
 	let Token, token, ACDM, acdm, owner, addr1, addr2, addr3;
 
-	const TOTAL_SUPPLY = ethers.utils.parseUnits("10000", process.env.TOKEN_DECIMALS);
     const roundTime = 259200;
 
     beforeEach(async () => {
@@ -27,8 +26,8 @@ describe('Contract: ACDMPlatform', () => {
         token = await Token.deploy('ACDMPlatform', 'ACDM');
         acdm = await ACDM.deploy(token.address, roundTime);    
         
-        const minter = keccak256(toUtf8Bytes("MINTER"));
-        const burner = keccak256(toUtf8Bytes("BURNER"));
+        const minter = await token.MINTER();
+        const burner = await token.BURNER();
 
         await token.grantRole(minter, acdm.address);
 		await token.grantRole(burner, acdm.address);
@@ -238,9 +237,6 @@ describe('Contract: ACDMPlatform', () => {
             await acdm.connect(addr1).addOrder(100, ethers.utils.parseUnits("0.1", process.env.TOKEN_DECIMALS));
             await acdm.connect(addr2).reedemOrder(1, 50, {value: hre.ethers.utils.parseEther("5")})
             await acdm.connect(addr1).removeOrder(1);
-
-            //console.log(await addr1.getBalance());
-            //console.log(await addr2.getBalance());
 
 			expect(await token.balanceOf(addr1.address)).to.equal(ethers.utils.parseUnits("950", process.env.TOKEN_DECIMALS));
             expect(await token.balanceOf(addr2.address)).to.equal(ethers.utils.parseUnits("50", process.env.TOKEN_DECIMALS));

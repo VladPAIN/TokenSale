@@ -2,7 +2,7 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./ERC20.sol";
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 contract ACDMPlatform is AccessControl, ReentrancyGuard {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
@@ -48,17 +48,13 @@ contract ACDMPlatform is AccessControl, ReentrancyGuard {
     uint256 public roundTime;
     uint256 public decimals = 10**18;
     uint256 public numOfOrder;
-    address public tokenAddress;
 
     constructor(address _token, uint256 _roundTime) public {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_ROLE, msg.sender);
 
         token = Token(_token);
         roundTime = _roundTime;
-        tokenAddress = _token;
 
-        _setRoleAdmin(ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
     function register(address _referrer) external {
@@ -102,9 +98,9 @@ contract ACDMPlatform is AccessControl, ReentrancyGuard {
         require(offer.status == Status.SaleRound, "Not a sale round now");
 
         if(referrers[msg.sender] != address(0)) {
-            _safeTransferETH(referrers[msg.sender], msg.value * 5 / 100);
+            _safeTransferETH(referrers[msg.sender], msg.value * 50 / 1000);
             if(referrers[referrers[msg.sender]] != address(0)){
-                _safeTransferETH(referrers[referrers[msg.sender]], msg.value * 3 / 100);
+                _safeTransferETH(referrers[referrers[msg.sender]], msg.value * 30 / 1000);
             }
         }
 
@@ -165,11 +161,9 @@ contract ACDMPlatform is AccessControl, ReentrancyGuard {
             if(referrers[referrers[msg.sender]] != address(0)){
                 _safeTransferETH(referrers[referrers[msg.sender]], msg.value * 25 / 1000);
             }
-            else {_safeTransferETH(address(this), msg.value * 25 / 1000);}
         }
-        else {_safeTransferETH(address(this), msg.value * 5 / 100);}
 
-        _safeTransferETH(orders[orderId].owner, orders[orderId].price * amount);
+        _safeTransferETH(orders[orderId].owner, orders[orderId].price * amount * 950 / 1000);
         orders[orderId].amount -= amount * decimals;
         offer.totalBuy += amount * decimals;
         offer.totalSupplyEth += msg.value;
